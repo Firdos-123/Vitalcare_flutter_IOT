@@ -1,66 +1,33 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart'; // For Clipboard
 import 'package:workout_fitness/common/color_extension.dart';
+import 'package:workout_fitness/view/Caregiver/caregiverpage5.dart';
 import 'package:workout_fitness/view/login/login_page2.dart';
-import 'package:flutter/services.dart'; // Import Clipboard package
 
-class WelcomeAboardPage extends StatefulWidget {
-  final String email; // Accepting email and password
-  final String password;
+class CaregiverFinalPage extends StatefulWidget {
+  final String patientId;
 
-  const WelcomeAboardPage({super.key, required this.email, required this.password});
+  const CaregiverFinalPage({super.key, required this.patientId});
 
   @override
-  State<WelcomeAboardPage> createState() => _WelcomeAboardPageState();
+  State<CaregiverFinalPage> createState() => _CaregiverFinalPageState();
 }
 
-class _WelcomeAboardPageState extends State<WelcomeAboardPage> {
-  String? patientId;
-  bool isLoading = true;
-  String? errorMessage;
-
+class _CaregiverFinalPageState extends State<CaregiverFinalPage> {
   @override
   void initState() {
     super.initState();
-    _initializeAndGenerateId();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _copyPatientIdToClipboard();
+    });
+    print("Navigated to CaregiverFinalPage with ID: ${widget.patientId}");
   }
 
-  Future<void> _initializeAndGenerateId() async {
-    try {
-      // Ensure Firebase is initialized
-      await Firebase.initializeApp();
-
-      final String generatedId =
-          'PID_${const Uuid().v4().substring(0, 6).toUpperCase()}';
-
-      // Storing patient info with email and password in Firestore
-      await FirebaseFirestore.instance.collection('patients').doc(generatedId).set({
-        'patientId': generatedId,
-        'email': widget.email,
-        'password': widget.password, // Storing password (ensure encryption in real apps)
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-
-      // Copy the generated Patient ID to clipboard
-      await Clipboard.setData(ClipboardData(text: generatedId));
-
-      setState(() {
-        patientId = generatedId;
-        isLoading = false;
-      });
-
-      // Optionally show a snackbar or toast to indicate successful copy action
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Patient ID copied to clipboard')),
-      );
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-        errorMessage = 'Error occurred: $e';
-      });
-    }
+  void _copyPatientIdToClipboard() {
+    Clipboard.setData(ClipboardData(text: widget.patientId));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Patient ID copied to clipboard')),
+    );
   }
 
   @override
@@ -71,9 +38,7 @@ class _WelcomeAboardPageState extends State<WelcomeAboardPage> {
         backgroundColor: TColor.primary,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Welcome Aboard!',
@@ -83,11 +48,7 @@ class _WelcomeAboardPageState extends State<WelcomeAboardPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : errorMessage != null
-            ? Center(child: Text(errorMessage!, style: const TextStyle(color: Colors.red)))
-            : Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -99,7 +60,7 @@ class _WelcomeAboardPageState extends State<WelcomeAboardPage> {
             ),
             const SizedBox(height: 40),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: _copyPatientIdToClipboard,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 80),
                 shape: RoundedRectangleBorder(
@@ -108,7 +69,7 @@ class _WelcomeAboardPageState extends State<WelcomeAboardPage> {
                 backgroundColor: TColor.primary,
               ),
               child: Text(
-                'Your Patient ID is: $patientId',
+                'Your Patient ID is: ${widget.patientId}',
                 style: const TextStyle(fontSize: 16, color: Colors.white),
               ),
             ),
@@ -123,8 +84,7 @@ class _WelcomeAboardPageState extends State<WelcomeAboardPage> {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const LoginPage2()),
+                  MaterialPageRoute(builder: (context) => const CarLoginPage2()),
                 );
               },
               style: ElevatedButton.styleFrom(

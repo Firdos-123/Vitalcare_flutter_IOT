@@ -1,15 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:workout_fitness/view/home/home_view.dart';
 import 'package:workout_fitness/view/login/Aboard.dart';
-import 'package:workout_fitness/view/login/login_page1.dart'; // Import the page to navigate back to
+import 'package:workout_fitness/common/color_extension.dart';
+import 'package:workout_fitness/view/login/caregiver_info.dart';// Import the page to navigate back to
 
-class HealthInfoPage extends StatefulWidget {
-  const HealthInfoPage({super.key});
+class HealthInfoPageDetails extends StatefulWidget {
+  final String patientId;
+
+  const HealthInfoPageDetails({super.key, required this.patientId});
 
   @override
   _HealthInfoPageState createState() => _HealthInfoPageState();
 }
 
-class _HealthInfoPageState extends State<HealthInfoPage> {
+class _HealthInfoPageState extends State<HealthInfoPageDetails> {
   // Variables to store form input
   String? selectedGender;
   String? bloodGroup;
@@ -23,20 +28,24 @@ class _HealthInfoPageState extends State<HealthInfoPage> {
   final medicalHistoryController = TextEditingController();
   final emergencyContactController = TextEditingController();
 
+
   @override
   Widget build(BuildContext context) {
-    MediaQuery.sizeOf(context);
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
         elevation: 0,
+        backgroundColor: TColor.primary,
         leading: IconButton(
-          icon: Image.asset('assets/img/back_fo.png'), // Back icon path
+          icon: const Icon(Icons.arrow_back), // Default back arrow icon
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage1())); // Go back to the previous page
+            Navigator.pop(context); // Go back to previous page
           },
         ),
-        title: const Text('Health Info'),
+        title: const Text(
+          'Health Info',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -64,42 +73,77 @@ class _HealthInfoPageState extends State<HealthInfoPage> {
             _buildTextField('Any Medical History', medicalHistoryController, TextInputType.text),
             _buildTextField('Emergency Contact No.', emergencyContactController, TextInputType.phone),
             const SizedBox(height: 40),
-            // Next and Remind Me Later buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Navigate to Patient Page on Next
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const WelcomeAboardPage()), // Replace with your patient page
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+            // Centered "Next" and "Remind Me Later" buttons
+            Center(
+              child: Column(
+                children: [
+                  ElevatedButton(
+                  onPressed: () async {
+            try {
+            await FirebaseFirestore.instance
+                .collection('patients')
+                .doc(widget.patientId)
+                .collection('details')
+                .doc('health_info') // You can also use .add({}) if you want auto-generated ID
+                .set({
+              'patientId': widget.patientId,
+            'gender': selectedGender,
+            'age': ageController.text,
+            'weight': weightController.text,
+            'height': heightController.text,
+            'bloodGroup': bloodGroup,
+            'familyHistory': familyHistoryController.text,
+            'allergies': allergiesController.text,
+            'chronicDiseases': chronicDiseasesController.text,
+            'currentMedications': currentMedicationsController.text,
+            'medicalHistory': medicalHistoryController.text,
+            'emergencyContact': emergencyContactController.text,
+            'updatedAt': FieldValue.serverTimestamp(),
+            });
+
+            // Navigate to Home
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CaregiverInfoPage(patientId: widget.patientId),
+
+              ),
+            );
+
+            } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to save health info: $e')),
+            );
+            }
+            },
+
+                style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      backgroundColor: const Color(0xff5DC7D4), // Button color
                     ),
-                    backgroundColor: const Color(0xff5DC7D4), // Button color
+                    child: const Text('Next', style: TextStyle(fontSize: 16, color: Colors.white)),
                   ),
-                  child: const Text('Next', style: TextStyle(fontSize: 16, color: Colors.white)),
-                ),
-                const SizedBox(width: 20),
-                TextButton(
-                  onPressed: () {
-                    // Handle "Remind Me Later"
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const WelcomeAboardPage()), // Replace with your patient page
-                    );
-                  },
-                  child: const Text(
-                    'Remind Me Later',
-                    style: TextStyle(color: Colors.grey, decoration: TextDecoration.underline),
+                  const SizedBox(height: 20), // Space between the buttons
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomePage(patientId: widget.patientId),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Remind Me Later',
+                      style: TextStyle(color: Colors.grey, decoration: TextDecoration.underline),
+                    ),
                   ),
-                ),
-              ],
+
+                ],
+              ),
             ),
             const SizedBox(height: 20),
           ],
@@ -108,7 +152,7 @@ class _HealthInfoPageState extends State<HealthInfoPage> {
     );
   }
 
-  // Method to build a text field
+  // Method to build a text field with a colored box
   Widget _buildTextField(String labelText, TextEditingController controller, TextInputType inputType) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -117,6 +161,8 @@ class _HealthInfoPageState extends State<HealthInfoPage> {
         keyboardType: inputType,
         decoration: InputDecoration(
           labelText: labelText,
+          filled: true,
+          fillColor: const Color(0xfff0f0f0), // Background color for the text box
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -125,13 +171,15 @@ class _HealthInfoPageState extends State<HealthInfoPage> {
     );
   }
 
-  // Method to build a dropdown field
+  // Method to build a dropdown field with a colored box
   Widget _buildDropdown(String labelText, List<String> items, ValueChanged<String?> onChanged, String? selectedItem) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: DropdownButtonFormField<String>(
         decoration: InputDecoration(
           labelText: labelText,
+          filled: true,
+          fillColor: const Color(0xfff0f0f0), // Background color for the dropdown
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
           ),

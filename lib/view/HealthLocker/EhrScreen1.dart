@@ -17,7 +17,7 @@ class ElectronicHealthRecords extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage())); // Navigate back to the previous screen
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage(patientId: 'PID_3115D3',))); // Navigate back to the previous screen
           },
         ),
       ),

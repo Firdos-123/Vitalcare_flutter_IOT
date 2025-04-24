@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:workout_fitness/view/Caregiver/caregicer_page1.dart';
-import 'package:workout_fitness/view/login/login_page1.dart';
-import '../../common_widget/round_button.dart'; // Make sure to import the RoundButton
+import 'package:workout_fitness/view/login/login_page2.dart';
+import 'package:workout_fitness/view/login/account.dart';
+import '../../common_widget/round_button.dart';
+import 'caregiver_page2.dart'; // Make sure to import the RoundButton
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class Caregiverpage1 extends StatelessWidget {
+  const Caregiverpage1({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +39,9 @@ class LoginPage extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 25), // Updated padding
                   child: RoundButton(
-                    title: 'Patient',
+                    title: 'Login with Patient ID',
                     onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage1()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage2()));
                     },
                     type: RoundButtonType.primary, // Set button type to primary
                   ),
@@ -50,9 +51,9 @@ class LoginPage extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 25), // Updated padding
                   child: RoundButton(
-                    title: 'Caregiver',
+                    title: 'Create New Patient ID',
                     onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const Caregiverpage1()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const CaregiverSignUpPage()));
                     },
                     type: RoundButtonType.primary, // Set button type to primary
                   ),

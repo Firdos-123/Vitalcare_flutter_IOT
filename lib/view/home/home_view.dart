@@ -1,211 +1,207 @@
 import 'package:flutter/material.dart';
+import 'package:workout_fitness/view/home/blynk_service.dart';
+import 'package:workout_fitness/view/HealthLocker/EhrScreen.dart';
+import 'package:workout_fitness/view/chatbot/chatbot_screen.dart';
+import 'package:workout_fitness/view/medicine_reminder/reminder_page.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class HomePage extends StatefulWidget {
+  final String patientId;
+
+  const HomePage({super.key, required this.patientId});
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+  late VitalService vitalService;
+  Map<String, dynamic> vitals = {
+    'temperature': '0',
+    'humidity': '0',
+    'heartbeat': '0',
+    'spo2': '0',
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    vitalService = VitalService();
+    _fetchVitals();
+  }
+
+  Future<void> _fetchVitals() async {
+    final fetchedVitals = await vitalService.getLatestVitals();
+    setState(() {
+      vitals = fetchedVitals;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Sample user data
-    String userName = "John Doe"; // Replace with actual user name fetched from profile
-    String currentDate = "Friday, July 13"; // Replace with actual date
-    int steps = 120; // Replace with actual steps
-    String heartRate = "72 BPM"; // Replace with actual heart rate
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('VitalCare'), // Left Title
-        centerTitle: true, // Center the title
-        actions: const [
-          Icon(Icons.signal_cellular_alt), // Signal Strength
-          SizedBox(width: 10),
-          Icon(Icons.battery_full), // Battery Status
-          SizedBox(width: 10),
-          Icon(Icons.notifications), // Notifications
-          SizedBox(width: 10),
+        title: const Text('VitalCare', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xff54B8D0))),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Image.asset('assets/img/u2.png', width: 30, height: 30),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Image.asset('assets/img/img_1.png', width: 24, height: 24),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationPage()));
+            },
+          ),
         ],
       ),
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // User Greeting
-                Text(
-                  'Hi, $userName!',
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  currentDate,
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-                const SizedBox(height: 20),
-
-                // Health Summary Section
-                const Text(
-                  'My Health Summary',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    // Add device logic here
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ), // Button color
-                  ),
-                  child: const Text('Add a Device'),
-                ),
-                const SizedBox(height: 20),
-
-                // Activity Cards
-                Expanded(
-                  child: ListView(
-                    children: [
-                      _buildActivityCard(
-                        context,
-                        title: 'Steps',
-                        icon: Icons.directions_walk,
-                        mainValue: '$steps',
-                        progressValue: steps / 8000,
-                        metrics: ['102.4 yd', '5.0 kcal', '0.9 min'],
-                      ),
-                      const SizedBox(height: 20),
-                      _buildActivityCard(
-                        context,
-                        title: 'Sleep',
-                        icon: Icons.bed,
-                        mainValue: '0h 00m',
-                        progressValue: 0,
-                        metrics: [],
-                      ),
-                      const SizedBox(height: 20),
-                      _buildActivityCard(
-                        context,
-                        title: 'Heart Rate',
-                        icon: Icons.favorite,
-                        mainValue: heartRate,
-                        progressValue: 1.0, // Assuming a constant value for demo
-                        metrics: [],
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Chatbot button
-          Positioned(
-            bottom: 80,
-            right: 20,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, '/chatbot'); // Navigate to the chatbot page
-              },
-              child: Image.asset(
-                'assets/img/chatbot.png', // Replace with your chatbot icon image path
-                width: 50,
-                height: 50,
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(color: Color(0xff54B8D0)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const CircleAvatar(radius: 25, backgroundImage: AssetImage('assets/img/u2.png')),
+                  const SizedBox(height: 8),
+                  Text('Patient ID: ${widget.patientId}', style: const TextStyle(color: Colors.white)),
+                ],
               ),
             ),
-          ),
-        ],
+            _drawerImageItem('assets/img/img_2.png', 'Patient Details', () {}),
+            _drawerImageItem('assets/img/img_2.png', 'Health Info', () {}),
+            _drawerImageItem('assets/img/img_2.png', 'Add Caregiver', () {}),
+            _drawerImageItem('assets/img/img_2.png', 'Change Password', () {}),
+            _drawerImageItem('assets/img/img_2.png', 'Logout', () {}),
+          ],
+        ),
       ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Row(
+              children: [
+                const CircleAvatar(backgroundImage: AssetImage('assets/img/u2.png'), radius: 25),
+                const SizedBox(width: 10),
+                Text('Hi - ${widget.patientId}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Center(
+              child: Column(
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {}, // Placeholder for future action
+                    icon: const Icon(Icons.download, color: Colors.white),
+                    label: const Text('Download Health Info'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xff54B8D0),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: _fetchVitals,
+                    icon: const Icon(Icons.refresh, color: Colors.white),
+                    label: const Text('Refresh'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xff54B8D0),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                children: [
+                  _buildVitalBox('Temperature', '${vitals['temperature']} °C'),
+                  _buildVitalBox('Humidity', '${vitals['humidity']} %'),
+                  _buildVitalBox('Heartbeat', '${vitals['heartbeat']} bpm'),
+                  _buildVitalBox('SpO2', '${vitals['spo2']} %'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 60.0), // Moves FAB upward
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatScreen()));
+          },
+          child: Image.asset('assets/img/chatbot.png', width: 60, height: 60),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: const Color(0xff54B8D0),
+        unselectedItemColor: Colors.grey,
+        currentIndex: _currentIndex,
         items: [
-          BottomNavigationBarItem(
-            icon: Image.asset('assets/img/menu_home.png', width: 30), // Replace with your home icon image path
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset('assets/img/menu_schedule.png', width: 30), // Replace with your health locker icon image path
-            label: 'Health Locker',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset("assets/img/menu_traning_plan.png", width: 30), // Replace with your tracker icon image path
-            label: 'Trackers',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset('assets/img/u1.png', width: 30), // Replace with your profile icon image path
-            label: 'Profile',
-          ),
+          BottomNavigationBarItem(icon: Image.asset('assets/img/menu_home.png', width: 24, height: 24), label: 'Home'),
+          BottomNavigationBarItem(icon: Image.asset('assets/img/menu_schedule.png', width: 24, height: 24), label: 'Health Locker'),
+          BottomNavigationBarItem(icon: Image.asset('assets/img/dashboard-half.png', width: 24, height: 24), label: 'Medicine Reminder'),
         ],
-        currentIndex: 0, // Change this based on current index
         onTap: (index) {
-          switch (index) {
-            case 0:
-              Navigator.pushNamed(context, '/dashboard'); // Navigate to dashboard
-              break;
-            case 1:
-              Navigator.pushNamed(context, '/healthlocker'); // Navigate to health locker
-              break;
-            case 2:
-              Navigator.pushNamed(context, '/trackers'); // Navigate to trackers
-              break;
-            case 3:
-              Navigator.pushNamed(context, '/profile'); // Navigate to profile
-              break;
+          setState(() => _currentIndex = index);
+          if (index == 1) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const EHRScreen()));
+          } else if (index == 2) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => MedicineReminderPage(patientId: widget.patientId)));
           }
         },
       ),
     );
   }
 
-  Widget _buildActivityCard(
-      BuildContext context, {
-        required String title,
-        required IconData icon,
-        required String mainValue,
-        required double progressValue,
-        required List<String> metrics,
-      }) {
-    return Card(
-      elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, size: 40, color: Colors.blue),
-                const SizedBox(width: 10),
-                Text(
-                  title,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Text(
-              mainValue,
-              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            LinearProgressIndicator(
-              value: progressValue,
-              backgroundColor: Colors.grey[300],
-              color: Colors.blue,
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: metrics
-                  .map((metric) => Text(metric, style: const TextStyle(color: Colors.grey)))
-                  .toList(),
-            ),
-          ],
-        ),
+  Widget _buildVitalBox(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xffE0F7FA),
+        border: Border.all(color: const Color(0xff54B8D0), width: 1.5),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
+          Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.black87)),
+        ],
       ),
     );
+  }
+
+  Widget _drawerImageItem(String imagePath, String title, VoidCallback onTap) {
+    return ListTile(
+      leading: Image.asset(imagePath, width: 24, height: 24),
+      title: Text(title),
+      onTap: onTap,
+    );
+  }
+}
+
+class NotificationPage extends StatelessWidget {
+  const NotificationPage({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(appBar: AppBar(title: const Text('Notifications')));
   }
 }

@@ -1,43 +1,45 @@
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
-  final bool isEnglish; // To toggle between English and another language
-
-  const ChatScreen({Key? key, this.isEnglish = true}) : super(key: key);
+  const ChatScreen({Key? key}) : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  String _selectedLanguage = 'English'; // Store selected language
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.teal,
-        title: Text(widget.isEnglish ? 'Vital' : 'वाइतल', style: const TextStyle(color: Colors.black)),
+        title: Text(_selectedLanguage == 'English' ? 'Vital' : 'वाइतल', style: const TextStyle(color: Colors.black)),
         actions: [
           DropdownButton<String>(
-            value: widget.isEnglish ? 'Language' : 'भाषा',
-            items: <String>['English', 'Hindi'].map((String value) {
+            value: _selectedLanguage,
+            items: <String>['English', 'Hindi', 'Spanish'].map((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Text(value),
               );
             }).toList(),
             onChanged: (newValue) {
-              // Handle language change
+              setState(() {
+                _selectedLanguage = newValue!; // Change language
+              });
             },
           ),
           IconButton(
-            icon: const Icon(Icons.settings, color: Colors.black),
+            icon: Image.asset('assets/img/img_3.png'), // Use your image here
             onPressed: () {
               // Settings action
             },
           ),
         ],
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black), // Use Flutter's back icon
           onPressed: () {
             Navigator.pop(context);
           },
@@ -49,37 +51,49 @@ class _ChatScreenState extends State<ChatScreen> {
             child: ListView(
               padding: const EdgeInsets.all(16.0),
               children: [
-                _buildChatMessage(widget.isEnglish
+                _buildChatMessage(_selectedLanguage == 'English'
                     ? "Hi, I am Vital, your health buddy. How may I help you today?"
-                    : "नमस्ते, मी वाइतल आहे, आपला स्वास्थ्य साथी."),
+                    : _selectedLanguage == 'Hindi'
+                    ? "नमस्ते, मी वाइतल आहे, आपला स्वास्थ्य साथी."
+                    : "Hola, soy Vital, tu compañero de salud."),
                 const SizedBox(height: 20),
                 Wrap(
                   spacing: 10,
                   runSpacing: 10,
                   children: [
-                    _buildQuickActionButton(
-                        widget.isEnglish ? "Find my Blood Report" : "माझी रक्त अहवाल शोधा"),
-                    _buildQuickActionButton(
-                        widget.isEnglish ? "Upload new Prescription" : "नवीन प्रिस्क्रिप्शन अपलोड करा"),
-                    _buildQuickActionButton(
-                        widget.isEnglish ? "Show my weekly sugar analysis" : "माझा साप्ताहिक साखर विश्लेषण दाखवा"),
-                    _buildQuickActionButton(
-                        widget.isEnglish ? "Download my Health Summary" : "माझा स्वास्थ्य सारांश डाउनलोड करा"),
+                    _buildQuickActionButton(_selectedLanguage == 'English'
+                        ? "Find my Blood Report"
+                        : _selectedLanguage == 'Hindi'
+                        ? "माझी रक्त अहवाल शोधा"
+                        : "Encuentra mi informe de sangre"),
+                    _buildQuickActionButton(_selectedLanguage == 'English'
+                        ? "Upload new Prescription"
+                        : _selectedLanguage == 'Hindi'
+                        ? "नवीन प्रिस्क्रिप्शन अपलोड करा"
+                        : "Subir nueva receta"),
+                    _buildQuickActionButton(_selectedLanguage == 'English'
+                        ? "Show my weekly sugar analysis"
+                        : _selectedLanguage == 'Hindi'
+                        ? "माझा साप्ताहिक साखर विश्लेषण दाखवा"
+                        : "Mostrar mi análisis semanal de azúcar"),
+                    _buildQuickActionButton(_selectedLanguage == 'English'
+                        ? "Download my Health Summary"
+                        : _selectedLanguage == 'Hindi'
+                        ? "माझा स्वास्थ्य सारांश डाउनलोड करा"
+                        : "Descargar mi resumen de salud"),
                   ],
                 ),
                 const SizedBox(height: 20),
-                _buildSentMessage(widget.isEnglish
+                _buildSentMessage(_selectedLanguage == 'English'
                     ? "Find my Blood Report"
-                    : "माझी रक्त अहवाल शोधा"),
-                _buildReceivedMessage(widget.isEnglish
+                    : _selectedLanguage == 'Hindi'
+                    ? "माझी रक्त अहवाल शोधा"
+                    : "Encuentra mi informe de sangre"),
+                _buildReceivedMessage(_selectedLanguage == 'English'
                     ? "Here is your Blood Report from August 2023"
-                    : "हे आहे आपला रक्त अहवाल ऑगस्ट 2023 चा"),
-                _buildSentMessage(widget.isEnglish
-                    ? "Give my weekly health analytics"
-                    : "माझा साप्ताहिक स्वास्थ्य विश्लेषण द्या"),
-                _buildReceivedMessage(widget.isEnglish
-                    ? "Here is your Health Summary"
-                    : "हे आहे आपला स्वास्थ्य सारांश"),
+                    : _selectedLanguage == 'Hindi'
+                    ? "हे आहे आपला रक्त अहवाल ऑगस्ट 2023 चा"
+                    : "Aquí está su informe de sangre de agosto de 2023"),
               ],
             ),
           ),
@@ -91,21 +105,21 @@ class _ChatScreenState extends State<ChatScreen> {
         selectedItemColor: Colors.teal,
         unselectedItemColor: Colors.grey,
         showUnselectedLabels: true,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
+            icon: Image.asset('assets/img/menu_home.png', width: 24), // Replace with your image
             label: 'Dashboard',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.lock_outline),
+            icon: Image.asset('assets/img/menu_schedule.png', width: 24), // Replace with your image
             label: 'Healthlocker',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.track_changes),
+            icon: Image.asset("assets/img/menu_traning_plan.png", width: 24), // Replace with your image
             label: 'Trackers',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: Image.asset('assets/img/u1.png', width: 24), // Replace with your image
             label: 'Profile',
           ),
         ],
@@ -113,7 +127,6 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  // Chat bubble for sent message
   Widget _buildSentMessage(String message) {
     return Align(
       alignment: Alignment.centerRight,
@@ -129,7 +142,6 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  // Chat bubble for received message
   Widget _buildReceivedMessage(String message) {
     return Align(
       alignment: Alignment.centerLeft,
@@ -145,11 +157,11 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  // Quick action button
   Widget _buildQuickActionButton(String label) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.black, backgroundColor: Colors.teal[50],
+        foregroundColor: Colors.black,
+        backgroundColor: Colors.teal[50],
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
         ),
@@ -161,7 +173,6 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  // Message input area with a text field and send button
   Widget _buildMessageInputArea() {
     return Padding(
       padding: const EdgeInsets.all(12),
@@ -185,7 +196,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.send, color: Colors.teal),
+            icon: Image.asset('assets/img/img_4.png'), // Replace with your image
             onPressed: () {
               // Send message functionality
             },
@@ -195,7 +206,6 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  // Helper function for chat bot messages
   Widget _buildChatMessage(String message) {
     return Align(
       alignment: Alignment.centerLeft,
@@ -212,6 +222,3 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 }
 
-void main() => runApp(const MaterialApp(
-  home: ChatScreen(),
-));

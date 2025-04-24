@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "948749616958",
+    "project_id": "vitalcare-app",
+    "storage_bucket": "vitalcare-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:948749616958:android:64e13c3b2b5e6683c24e6f",
+        "android_client_info": {
+          "package_name": "com.codeforany.workout_fitness"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "948749616958-fkm5mjngegfqg6kj1pqi63040arbeplm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5GbgQeyYDKe8NsJyTNWAkUH8cz_u8zfE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "948749616958-fkm5mjngegfqg6kj1pqi63040arbeplm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

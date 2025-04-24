@@ -12,7 +12,7 @@ class EHRScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage(patientId: 'PID_3115D3')));
           },
         ),
       ),
@@ -27,7 +27,7 @@ class EHRScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16.0),
             Image.asset(
-              'assets/document.png', // Replace with your image
+              'assets/img/upload.png', // Replace with your image
               width: 100,
               height: 100,
             ),
@@ -59,7 +59,7 @@ class EHRScreen extends StatelessWidget {
                 ),
                 const SizedBox(width: 16.0),
                 Image.asset(
-                  'assets/chatbot.png', // Replace with your image
+                  'assets/img/chatbot.png', // Replace with your image
                   width: 50,
                   height: 50,
                 ),

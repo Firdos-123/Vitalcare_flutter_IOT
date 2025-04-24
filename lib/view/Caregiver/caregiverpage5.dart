@@ -1,20 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:workout_fitness/common/color_extension.dart';
+import 'package:workout_fitness/view/Caregiver/caregiver_page2.dart';
 import 'package:workout_fitness/view/home/home_view.dart'; // HomePage after successful login
-import 'package:workout_fitness/view/login/details.dart';
-import 'package:workout_fitness/view/login/login_page1.dart'; // Navigate to LoginPage1
-import 'package:workout_fitness/view/login/account.dart'; // Navigate to Account Page
+
+ // Navigate to LoginPage1
+ // Navigate to Account Page
 import 'package:workout_fitness/view/login/forgot_password_page.dart'; // Optional for forgot password
 
-class LoginPage2 extends StatefulWidget {
-  const LoginPage2({super.key});
+class CarLoginPage2 extends StatefulWidget {
+  const CarLoginPage2({super.key});
 
   @override
   _LoginPage2State createState() => _LoginPage2State();
 }
 
-class _LoginPage2State extends State<LoginPage2> {
+class _LoginPage2State extends State<CarLoginPage2> {
   final _formKey = GlobalKey<FormState>();
   final _patientIdController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -30,7 +31,7 @@ class _LoginPage2State extends State<LoginPage2> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back), // Default back button
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage1()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const CaregiverSignUpPage()));
           },
         ),
         title: const Text(
@@ -161,8 +162,11 @@ class _LoginPage2State extends State<LoginPage2> {
                               // Correct credentials, navigate to HealthInfoPage with the Firestore doc ID
                               Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (context) => HealthInfoPageDetails(patientId: patientDoc.id)),
+                                MaterialPageRoute(
+                                  builder: (context) => HomePage(patientId: patientDoc['patientId']),
+                                ),
                               );
+
                             }
                             else {
                               // Incorrect password
@@ -237,7 +241,7 @@ class _LoginPage2State extends State<LoginPage2> {
                       // Redirect to Account Page for sign up
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SignUpPage()),
+                        MaterialPageRoute(builder: (context) => const CaregiverSignUpPage()),
                       );
                     },
                     child: const Text(

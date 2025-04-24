@@ -52,7 +52,7 @@ class LoginPage1 extends StatelessWidget {
                   child: RoundButton(
                     title: 'Sign In',
                     onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const AccountPage()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const SignUpPage()));
                     },
                     type: RoundButtonType.primary, // Set button type to primary
                   ),
